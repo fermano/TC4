@@ -46,3 +46,12 @@ def test_handoff_rows_reject_unknown_minimum_severity() -> None:
 
 def test_release_marker_trims_surrounding_whitespace() -> None:
     assert extract_release_marker("  20260530-rc2  ") == "20260530-rc2"
+
+
+def test_release_marker_accepts_case_insensitive_support_prefix() -> None:
+    assert extract_release_marker("  ReLeAsE: 20260530-rc2  ") == "20260530-rc2"
+
+
+def test_release_marker_rejects_empty_support_prefix() -> None:
+    with pytest.raises(ValueError, match="must include a value"):
+        extract_release_marker(" release:   ")
