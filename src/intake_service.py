@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from typing import TypedDict
 
@@ -13,6 +14,7 @@ class HandoffRow(TypedDict):
 
 
 SEVERITY_RANK = {"low": 1, "medium": 2, "high": 3, "critical": 4}
+RELEASE_MARKER_PREFIX_RE = re.compile(r"^release:\s*", re.IGNORECASE)
 
 
 def resolve_retry_budget(requested: int | None, default: int) -> int:
@@ -39,5 +41,11 @@ def filter_handoff_rows(
 
 
 def extract_release_marker(note: str) -> str:
-    """Normalize surrounding whitespace for a release marker."""
-    return note.strip()
+    """Normalize a plain or support-prefixed release marker."""
+    marker = note.strip()
+    if RELEASE_MARKER_PREFIX_RE.match(marker):
+        marker = RELEASE_MARKER_PREFIX_RE.sub("", marker, count=1).strip()
+        if not marker:
+            raise ValueError("prefixed release marker must include a value")
+
+    return marker
