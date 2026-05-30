@@ -1,0 +1,7 @@
+review:
+  stale_window_hours: 48
+  same_head_rerun_budget: 2
+release:
+  default_channel: internal
+handoff:
+  fallback_owner: release-ops
