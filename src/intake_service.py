@@ -30,7 +30,11 @@ def filter_handoff_rows(
     if minimum_severity is None:
         return row_list
 
-    minimum_rank = SEVERITY_RANK.get(minimum_severity, max(SEVERITY_RANK.values()) + 1)
+    try:
+        minimum_rank = SEVERITY_RANK[minimum_severity]
+    except KeyError as exc:
+        raise ValueError(f"unknown minimum severity: {minimum_severity}") from exc
+
     return [row for row in row_list if SEVERITY_RANK.get(row["severity"], 0) >= minimum_rank]
 
 
