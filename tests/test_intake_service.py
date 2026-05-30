@@ -13,6 +13,10 @@ def test_retry_budget_accepts_positive_override() -> None:
     assert resolve_retry_budget(2, 3) == 2
 
 
+def test_retry_budget_accepts_zero_override() -> None:
+    assert resolve_retry_budget(0, 3) == 0
+
+
 def test_handoff_rows_keep_input_order() -> None:
     rows = [
         {"owner": "platform", "severity": "high", "summary": "Queue delay"},
