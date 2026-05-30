@@ -1,3 +1,5 @@
+import pytest
+
 from src.intake_service import (
     extract_release_marker,
     filter_handoff_rows,
@@ -35,6 +37,11 @@ def test_handoff_rows_filter_by_minimum_severity_in_input_order() -> None:
     ]
 
     assert filter_handoff_rows(rows, minimum_severity="high") == [rows[0], rows[2]]
+
+
+def test_handoff_rows_reject_unknown_minimum_severity() -> None:
+    with pytest.raises(ValueError, match="unknown minimum severity"):
+        filter_handoff_rows([], minimum_severity="urgent")
 
 
 def test_release_marker_trims_surrounding_whitespace() -> None:
