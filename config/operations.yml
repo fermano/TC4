@@ -1,5 +1,5 @@
 review:
-  stale_window_hours: 48
+  stale_window_hours: 72
   same_head_rerun_budget: 2
 release:
   default_channel: internal
