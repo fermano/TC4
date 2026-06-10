@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 
 
-_RELEASE_PREFIX_RE = re.compile(r"^release:\\s*", re.IGNORECASE)
+_RELEASE_PREFIX_RE = re.compile(r"^release:\s*", re.IGNORECASE)
 
 
 def parse_release_marker_preview(note: str) -> str:
