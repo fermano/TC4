@@ -47,6 +47,14 @@ def test_summarize_signals_for_handoff_rolls_owner_severity_and_count():
     assert summary.signal_count == 2
 
 
+def test_summarize_signals_for_handoff_routes_empty_batches_to_fallback_owner():
+    summary = summarize_signals_for_handoff([], fallback_owner="Release Ops")
+
+    assert summary.highest_severity == "low"
+    assert summary.owners == ("release-ops",)
+    assert summary.signal_count == 0
+
+
 def test_build_release_marker_defaults_blank_channel_to_internal():
     marker = build_release_marker("2026.05.30", "   ")
 
