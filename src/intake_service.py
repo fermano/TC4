@@ -15,6 +15,13 @@ class HandoffRow(TypedDict):
 
 SEVERITY_RANK = {"low": 1, "medium": 2, "high": 3, "critical": 4}
 RELEASE_MARKER_PREFIX_RE = re.compile(r"^release:\s*", re.IGNORECASE)
+OWNER_SLUG_RE = re.compile(r"[^a-z0-9]+")
+
+
+def normalize_owner(owner: str) -> str:
+    """Return the routing key used for copied handoff owners."""
+    cleaned = OWNER_SLUG_RE.sub("-", owner.strip().lower()).strip("-")
+    return cleaned or "unassigned"
 
 
 def resolve_retry_budget(requested: int | None, default: int) -> int:
@@ -30,18 +37,24 @@ def filter_handoff_rows(
     rows: Iterable[HandoffRow],
     *,
     minimum_severity: str | None = None,
+    owner: str | None = None,
 ) -> list[HandoffRow]:
     """Return qualifying handoff rows in the order copied from support notes."""
     row_list = list(rows)
-    if minimum_severity is None:
-        return row_list
+    if minimum_severity is not None:
+        try:
+            minimum_rank = SEVERITY_RANK[minimum_severity]
+        except KeyError as exc:
+            raise ValueError(f"unknown minimum severity: {minimum_severity}") from exc
+        row_list = [
+            row for row in row_list if SEVERITY_RANK.get(row["severity"], 0) >= minimum_rank
+        ]
 
-    try:
-        minimum_rank = SEVERITY_RANK[minimum_severity]
-    except KeyError as exc:
-        raise ValueError(f"unknown minimum severity: {minimum_severity}") from exc
+    if owner is not None:
+        owner_key = normalize_owner(owner)
+        row_list = [row for row in row_list if normalize_owner(row["owner"]) == owner_key]
 
-    return [row for row in row_list if SEVERITY_RANK.get(row["severity"], 0) >= minimum_rank]
+    return row_list
 
 
 def extract_release_marker(note: str) -> str:
