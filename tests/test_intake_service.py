@@ -49,6 +49,41 @@ def test_handoff_rows_reject_unknown_minimum_severity() -> None:
         filter_handoff_rows([], minimum_severity="urgent")
 
 
+def test_handoff_rows_filter_by_normalized_owner_in_input_order() -> None:
+    rows = [
+        {"owner": "Engineering Ops", "severity": "low", "summary": "First"},
+        {"owner": "support", "severity": "critical", "summary": "Second"},
+        {"owner": "engineering-ops", "severity": "high", "summary": "Third"},
+    ]
+
+    assert filter_handoff_rows(rows, owner=" engineering OPS! ") == [rows[0], rows[2]]
+
+
+def test_handoff_rows_combine_owner_and_minimum_severity_filters() -> None:
+    rows = [
+        {"owner": "release", "severity": "low", "summary": "First"},
+        {"owner": "support", "severity": "critical", "summary": "Second"},
+        {"owner": "Release", "severity": "high", "summary": "Third"},
+    ]
+
+    assert filter_handoff_rows(rows, owner="release", minimum_severity="high") == [rows[2]]
+
+
+def test_handoff_rows_return_empty_list_when_owner_does_not_match() -> None:
+    rows = [{"owner": "support", "severity": "high", "summary": "Queue delay"}]
+
+    assert filter_handoff_rows(rows, owner="release") == []
+
+
+def test_handoff_rows_filter_blank_owners_as_unassigned() -> None:
+    rows = [
+        {"owner": "support", "severity": "high", "summary": "Named owner"},
+        {"owner": "   ", "severity": "low", "summary": "Copied blank owner"},
+    ]
+
+    assert filter_handoff_rows(rows, owner="") == [rows[1]]
+
+
 def test_release_marker_trims_surrounding_whitespace() -> None:
     assert extract_release_marker("  20260530-rc2  ") == "20260530-rc2"
 
