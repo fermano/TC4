@@ -19,7 +19,11 @@ RELEASE_MARKER_PREFIX_RE = re.compile(r"^release:\s*", re.IGNORECASE)
 
 def resolve_retry_budget(requested: int | None, default: int) -> int:
     """Return the configured retry count unless a request overrides it."""
-    return default if requested is None else requested
+    if requested is None:
+        return default
+    if requested < 0:
+        raise ValueError("retry budget must be zero or greater")
+    return requested
 
 
 def filter_handoff_rows(
