@@ -13,6 +13,12 @@ class HandoffRow(TypedDict):
     summary: str
 
 
+class HandoffCounts(TypedDict):
+    total: int
+    by_owner: dict[str, int]
+    by_severity: dict[str, int]
+
+
 SEVERITY_RANK = {"low": 1, "medium": 2, "high": 3, "critical": 4}
 RELEASE_MARKER_PREFIX_RE = re.compile(r"^release:\s*", re.IGNORECASE)
 OWNER_SLUG_RE = re.compile(r"[^a-z0-9]+")
@@ -55,6 +61,29 @@ def filter_handoff_rows(
         row_list = [row for row in row_list if normalize_owner(row["owner"]) == owner_key]
 
     return row_list
+
+
+def summarize_handoff_rows(rows: Iterable[HandoffRow]) -> HandoffCounts:
+    """Count handoff rows by normalized owner and recognized severity."""
+    total = 0
+    by_owner: dict[str, int] = {}
+    by_severity: dict[str, int] = {}
+
+    for row in rows:
+        total += 1
+
+        owner_key = normalize_owner(row["owner"])
+        by_owner[owner_key] = by_owner.get(owner_key, 0) + 1
+
+        severity_key = row["severity"].strip().lower()
+        if severity_key in SEVERITY_RANK:
+            by_severity[severity_key] = by_severity.get(severity_key, 0) + 1
+
+    return {
+        "total": total,
+        "by_owner": by_owner,
+        "by_severity": by_severity,
+    }
 
 
 def extract_release_marker(note: str) -> str:
