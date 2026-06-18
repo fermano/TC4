@@ -19,6 +19,11 @@ def test_retry_budget_accepts_zero_override() -> None:
     assert resolve_retry_budget(0, 3) == 0
 
 
+def test_retry_budget_rejects_negative_override() -> None:
+    with pytest.raises(ValueError, match="zero or greater"):
+        resolve_retry_budget(-1, 3)
+
+
 def test_handoff_rows_keep_input_order() -> None:
     rows = [
         {"owner": "platform", "severity": "high", "summary": "Queue delay"},
