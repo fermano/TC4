@@ -4,6 +4,7 @@ from src.intake_service import (
     extract_release_marker,
     filter_handoff_rows,
     resolve_retry_budget,
+    summarize_handoff_rows,
 )
 
 
@@ -82,6 +83,31 @@ def test_handoff_rows_filter_blank_owners_as_unassigned() -> None:
     ]
 
     assert filter_handoff_rows(rows, owner="") == [rows[1]]
+
+
+def test_handoff_row_summary_counts_normalized_owners_and_known_severities() -> None:
+    rows = iter(
+        [
+            {"owner": "Engineering Ops", "severity": " HIGH ", "summary": "First"},
+            {"owner": "engineering-ops", "severity": "unknown", "summary": "Second"},
+            {"owner": "Support", "severity": "low", "summary": "Third"},
+            {"owner": "   ", "severity": "", "summary": "Fourth"},
+        ]
+    )
+
+    assert summarize_handoff_rows(rows) == {
+        "total": 4,
+        "by_owner": {"engineering-ops": 2, "support": 1, "unassigned": 1},
+        "by_severity": {"high": 1, "low": 1},
+    }
+
+
+def test_handoff_row_summary_handles_empty_iterable() -> None:
+    assert summarize_handoff_rows([]) == {
+        "total": 0,
+        "by_owner": {},
+        "by_severity": {},
+    }
 
 
 def test_release_marker_trims_surrounding_whitespace() -> None:
