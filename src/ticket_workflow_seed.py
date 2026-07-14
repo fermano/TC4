@@ -3,7 +3,7 @@ DEFAULT_OWNER = "engineering-ops"
 
 def normalize_delivery_owner(owner: str | None) -> str:
     """Return the routing key used by delivery workflows."""
-    normalized = (owner or "").strip().lower()
+    normalized = " ".join((owner or "").split()).lower()
     return normalized or DEFAULT_OWNER
 
 
@@ -14,5 +14,6 @@ def delivery_summary(record: dict, *, include_source: bool = False) -> dict:
         "status": record["status"],
     }
     if include_source:
-        summary["source"] = record.get("source") or "unknown"
+        source = (record.get("source") or "").strip()
+        summary["source"] = source or "unknown"
     return summary
