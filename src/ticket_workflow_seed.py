@@ -7,9 +7,13 @@ def normalize_delivery_owner(owner: str | None) -> str:
     return normalized or DEFAULT_OWNER
 
 
-def delivery_summary(record: dict) -> dict:
+def delivery_summary(record: dict, *, include_source: bool = False) -> dict:
     """Return the stable summary fields currently exposed to callers."""
-    return {
+    summary = {
         "owner": normalize_delivery_owner(record.get("owner")),
         "status": record["status"],
     }
+    if include_source:
+        source = (record.get("source") or "").strip()
+        summary["source"] = source or "unknown"
+    return summary
