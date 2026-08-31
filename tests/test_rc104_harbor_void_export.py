@@ -22,3 +22,14 @@ def test_snake_void_reason_suppresses_export_row():
     assert row["status"] == "voided"
     assert row["include_in_export"] is False
     assert row["void_reason"] == "duplicate-scan"
+
+
+def test_empty_snake_void_reason_keeps_active_row():
+    row = build_export_row(
+        {"tenant": "harbor", "shipment_id": "ship-616", "void_reason": ""},
+        {"route": "ferry", "audit_key": "hb-a"},
+    )
+
+    assert row["status"] == "active"
+    assert row["include_in_export"] is True
+    assert row["audit_key"] == "hb-a"
