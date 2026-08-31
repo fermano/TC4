@@ -1,4 +1,4 @@
-from src.tc4_rc84_void_gate import build_shipment_action
+from src.tc4_rc84_void_gate import ARTIFACT_SCHEMA, build_shipment_action
 
 
 def test_void_gate_uses_route_shape():
@@ -11,6 +11,8 @@ def test_void_gate_uses_route_shape():
     assert row["route_id"] == "cold-chain"
     assert row["action"] == "void"
     assert row["source"] == "rc84-route-void"
+    assert row["artifact_schema"] == ARTIFACT_SCHEMA
+    assert row["route_action_key"] == "cold-chain:ship-642:void"
 
 
 def test_missing_reason_keeps_ship_action():
