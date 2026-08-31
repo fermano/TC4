@@ -10,4 +10,5 @@ def build_export_row(payload, route_defaults):
         "void_reason": reason or "",
         "artifact_stage": route_defaults.get("artifact_stage", "rc104"),
         "audit_key": route_defaults.get("audit_key", "unset"),
+        "release_channel": route_defaults.get("release_channel", "candidate"),
     }
