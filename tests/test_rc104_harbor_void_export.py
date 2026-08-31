@@ -4,13 +4,14 @@ from src.rc104_harbor_void_export import build_export_row
 def test_active_row_is_included_when_no_void_reason():
     row = build_export_row(
         {"tenant": "harbor", "shipment_id": "ship-614"},
-        {"route": "ferry", "artifact_stage": "candidate", "audit_key": "hb-a"},
+        {"route": "ferry", "artifact_stage": "candidate", "audit_key": "hb-a", "release_channel": "rc104-final"},
     )
 
     assert row["status"] == "active"
     assert row["include_in_export"] is True
     assert row["artifact_stage"] == "candidate"
     assert row["audit_key"] == "hb-a"
+    assert row["release_channel"] == "rc104-final"
 
 
 def test_snake_void_reason_suppresses_export_row():
@@ -22,3 +23,4 @@ def test_snake_void_reason_suppresses_export_row():
     assert row["status"] == "voided"
     assert row["include_in_export"] is False
     assert row["void_reason"] == "duplicate-scan"
+    assert row["release_channel"] == "candidate"
