@@ -1,6 +1,6 @@
 def build_export_row(payload, route_defaults):
     reason = payload.get("void_reason")
-    voided = bool(reason)
+    voided = reason is not None and reason != ""
     return {
         "tenant": payload["tenant"],
         "shipment_id": payload["shipment_id"],
