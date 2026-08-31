@@ -1,6 +1,15 @@
+def _void_reason(payload):
+    value = payload.get("void_reason")
+    if value is None:
+        value = payload.get("voidReason")
+    if isinstance(value, str):
+        value = value.strip()
+    return value or None
+
+
 def build_export_row(payload, route_defaults):
-    reason = payload.get("void_reason")
-    voided = bool(reason)
+    reason = _void_reason(payload)
+    voided = reason is not None
     return {
         "tenant": payload["tenant"],
         "shipment_id": payload["shipment_id"],
