@@ -16,3 +16,13 @@ def test_void_gate_uses_route_shape():
 def test_missing_reason_keeps_ship_action():
     row = build_shipment_action({"tenant_id": "harbor", "route_id": "ground", "shipment_id": "ship-104"})
     assert row["action"] == "ship"
+
+
+def test_blank_reason_does_not_void():
+    row = build_shipment_action({
+        "tenant_id": "harbor",
+        "route_id": "cold-chain",
+        "shipment_id": "ship-642",
+        "void_reason": "  ",
+    })
+    assert row["action"] == "ship"
